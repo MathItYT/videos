@@ -1,3 +1,5 @@
+# Code for ManimCE
+
 from manim import *
 
 

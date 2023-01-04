@@ -1,0 +1,4 @@
+[project]
+name = "mathlike-videos"
+classifiers = ["Private :: Do Not Upload"]
+version = "0"
