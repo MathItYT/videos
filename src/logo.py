@@ -49,7 +49,7 @@ class Logo(VMobject):
     def __init__(self, text=True):
         super().__init__()
         self.text = text
-        circ = Circle(color=WHITE) \
+        circ = Circle(stroke_color=WHITE) \
             .set_fill(LOGO_COLOR, opacity=1)
         sum_symb = Tex("\\sum", color=WHITE)
         mobs = [VGroup(circ, sum_symb)]

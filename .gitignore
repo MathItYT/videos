@@ -1,4 +1,5 @@
 __pycache__
+.conda
 media
 list.txt
 output.mp4
@@ -12,3 +13,4 @@ raster
 vector
 build
 mathlike_videos.egg-info
+*.mp4

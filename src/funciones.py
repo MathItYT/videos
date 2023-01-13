@@ -6,12 +6,13 @@ from logo import Logo
 
 
 class Thumbnail(Scene):
+    n: int = 1
     def construct(self):
         title = Text("¿Qué es una función?").scale(2)
-        subtitle = Text("Parte 1").scale(1.5)
+        subtitle = Text(f"Parte {self.n}").scale(1.5)
         VGroup(title, subtitle).arrange(DOWN)
         logo = Logo().scale(0.75).to_corner(DR)
-        func = Tex("y", "=", "f", "(", "x", ")") \
+        func = Tex("y=f(x)", isolate=["f", "x", "y"]) \
             .set_color_by_tex_to_color_map({"f": GREY, "x": BLUE, "y": YELLOW}) \
             .scale(2) \
             .to_corner(UL)
@@ -19,12 +20,13 @@ class Thumbnail(Scene):
 
 
 class IntroVideo(Intro):
+    n: int = 1
     def construct(self):
         titulo = Text("Funciones", font_size=72).to_edge(UP)
         self.play(DrawBorderThenFill(titulo))
         subtitulo = Text("¿Qué son y para qué sirven?") \
             .next_to(titulo, DOWN)
-        parte = Text("Parte 1").to_edge(DOWN)
+        parte = Text(f"Parte {self.n}").to_edge(DOWN)
         self.play(GrowFromEdge(subtitulo, UP))
         self.play(Write(parte))
         super().construct()
