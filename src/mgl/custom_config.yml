@@ -1,0 +1,19 @@
+break_into_partial_movies: false
+camera_resolutions:
+  default_resolution: high
+directories:
+  mirror_module_path: false
+  output: output
+  raster_images: raster
+  sounds: sound
+  temporary_storage: temp
+  vector_images: vector
+fps: 60
+full_screen: false
+style:
+  background_color: '#000000'
+  font: Poppins
+  tex_template: default
+universal_import_line: from manimlib import *
+window_monitor: 0
+window_position: UR
