@@ -10,7 +10,8 @@ def load_mob_default(
     background_color=None,
     text_font="CMU Serif",
     vmob_default_color=None,
-    custom_font_tex=None
+    custom_font_tex=None,
+    opengl=False
 ):
     if custom_font_tex is None:
         preamble = r"""
@@ -68,6 +69,10 @@ def load_mob_default(
 
     if vmob_default_color is not None:
         VMobject.set_default(color=vmob_default_color)
+    
+    if opengl:
+        config.renderer = "opengl"
+        config.write_to_movie = False
     
     NumberPlane.set_default(x_range=[-config.frame_x_radius, config.frame_x_radius, 1], y_range=[-config.frame_y_radius, config.frame_y_radius, 1])
     TracedPath.set_default(stroke_color=VMobject().color)

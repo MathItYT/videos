@@ -10,10 +10,11 @@ class SceneComposition(Scene):
         for scene in self.scenes:
             self.subscene_setup(scene)
             scene.construct(self)
-            self.remove(*self.mobjects)
+            if len(self.mobjects) > 0: self.remove(*self.mobjects)
     
     def subscene_setup(self, scene):
         pass
+
 
 class VoiceoverComposition(SceneComposition, VoiceoverScene):
     music_files: list = []

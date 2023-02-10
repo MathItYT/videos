@@ -4,23 +4,10 @@ from scene_composition import VoiceoverComposition
 from custom_animations import GrowEachCharText, ShrinkEachCharText
 from logo import Logo
 from intro import Intro
-from blocks import DefinitionBlock
 from mob_default import load_mob_default
 
 
 load_mob_default()
-
-
-a_cross_b_block = DefinitionBlock(
-    VGroup(
-        Tex(r"El producto cartesiano entre $A$ y $B$, $A\times B$, se\\ define como", color=BLACK, tex_environment=None),
-        MathTex(
-            "A", r"\times", "B", "=", r"\{", "(", r"a\relax", ",", "b", ")", ":",
-            r"a\relax", r"\in", "A", r"\land", "b", r"\in", "B", r"\}", color=BLACK
-        )
-    ).arrange(DOWN),
-    index=1
-)
 
 
 class Thumbnail(Scene):
@@ -115,101 +102,56 @@ class IntroduccionComposition(VoiceoverComposition, Intro):
     scenes = [Introduccion, Introduccion2, Intro]
 
 
-class ContenidoDelVideo(Scene):
-    i: int = 0
+class FormulaEulerIntro(VoiceoverScene):
     def construct(self):
-        titulo = Text("Contenido del video").to_edge(UP)
-        table = MobjectTable([
-            [Tex("Conceptos previos"), BulletedList("Producto cartesiano", "Relaciones", "Funciones")],
-            [Tex("Raíz cuadrada real"), BulletedList("Raíces cuadradas de un número", "Raíz cuadrada principal")],
-            [Tex("Números complejos"), BulletedList("Para qué", "Propiedades", "Forma polar")],
-            [Tex("Raíz cuadrada compleja"), BulletedList("")]
-        ])
-        self.play(GrowEachCharText(titulo))
-        self.play(Write(lst))
+        formula_euler = Text("Fórmula de Euler")
+        with self.voiceover("Fórmula de Euler"):
+            self.play(GrowEachCharText(formula_euler))
+        self.play(ShrinkEachCharText(formula_euler))
 
 
-class ProductoCartesiano(VoiceoverScene):
+class FormulaEuler1(VoiceoverScene):
     def construct(self):
-        with self.voiceover("Primero vamos a partir resumiendo conceptos previos, como el producto cartesiano"):
-            titulo = Text("¿Qué es el producto cartesiano?").to_edge(UP)
-            self.play(GrowEachCharText(titulo))
-        
-        with self.voiceover("Tenemos dos conjuntos, A y B"):
-            self.play(titulo.animate.to_edge(UP))
-            set1 = MathTex("A", "=", r"\{", "X", ",", "X", ",", "X", r"\}") \
-                .set_color_by_tex("A", BLUE)
-            to_replace = set1[3:8:2]
-            dots = VGroup(*[Dot(color=dot_color) for dot_color in (PURE_RED, WHITE, PURE_BLUE)])
-            for i, dot, replaced in zip(range(3, 8, 2), dots, to_replace):
-                dot.replace(replaced)
-                set1.submobjects[i] = dot
-            set2 = MathTex("B", "=", r"\{", "1", ",", "2", ",", "3", ",", "4", r"\}") \
-                .set_color_by_tex("B", YELLOW)
-            VGroup(set1, set2).arrange(DOWN)
-            self.play(GrowEachCharText(set1))
-            self.play(GrowEachCharText(set2))
-        
         with self.voiceover(
-            """Para que se entienda la idea del producto cartesiano, diremos que el par ordenado
-            pelotita roja con número 2 pertenece al producto cartesiano entre A y B"""
+            """Los números complejos en su forma binómica son a + bi,
+            con a y b números reales"""
         ):
-            red_ball = dots[0].copy()
-            tex_to_color_map = {"A": BLUE, "B": YELLOW}
-            belongs = MathTex("(", "X", ",", "2", ")", r"\in", "A", r"\times", "B") \
-                .set_color_by_tex_to_color_map(tex_to_color_map).to_edge(DOWN)
-            red_ball.replace(belongs[1])
-            belongs.submobjects[1] = red_ball
-            self.play(GrowEachCharText(belongs))
+            tex_to_color_map = {"z": GREY, "a": BLUE, r"b\relax": YELLOW, r"\mathbb{R}": GREY, r"i\relax": GREY}
+            z_tex = MathTex("z", "=", "a", "+", r"b\relax", r"i\relax") \
+                .set_color_by_tex_to_color_map(tex_to_color_map)
+            rec = BackgroundRectangle(z_tex, BLACK, buff=0.2, corner_radius=0.1)
+            self.add(rec)
+            rec.add_updater(lambda m: m.move_to(z_tex))
+            self.play(Write(z_tex))
+            self.wait()
+            a_b_in_R = MathTex("a", ",", r"b\relax", r"\in", r"\mathbb{R}") \
+                .set_color_by_tex_to_color_map(tex_to_color_map) \
+                .next_to(z_tex, DOWN)
+            self.play(GrowEachCharText(a_b_in_R))
+        
+        with self.voiceover("Si graficas un número complejo en el denominado plano complejo, resultará esto"):
+            z = ComplexValueTracker(2 + 1j)
+            ax = Axes().add_coordinates()
+            labels = ax.get_axis_labels(r"\Re", r"\Im")
+            dot = Dot(ax.c2p(z.get_value().real, z.get_value().imag), color=GREY)
+            self.play(
+                Write(VGroup(ax, labels)),
+                Create(dot),
+                FadeOut(a_b_in_R),
+                z_tex.animate.next_to(dot, RIGHT, aligned_edge=DOWN)
+            )
+            self.bring_to_front(rec, z_tex)
+        
+        with self.voiceover("En el punto, la abscisa será la parte real y la ordenada la parte imaginaria"):
+            dot.add_updater(lambda m: m.move_to(ax.c2p(z.get_value().real, z.get_value().imag)))
+            z_tex.add_updater(lambda m: m.next_to(dot, RIGHT, aligned_edge=DOWN))
+            self.play(z.animate.set_value(-3 - 2j))
             self.wait(2)
-            self.play(ShowPassingFlash(Underline(belongs, color=YELLOW)))
-        
-        with self.voiceover("Debido a que la primera componente es un elemento de A y la segunda de B"):
-            belongs_a = MathTex("X", r"\in", "A").set_color_by_tex_to_color_map(tex_to_color_map)
-            red_ball_2 = red_ball.copy()
-            red_ball_2.replace(belongs_a[0])
-            belongs_a.submobjects[0] = red_ball_2
-            belongs_b = MathTex("2", r"\in", "B").set_color_by_tex_to_color_map(tex_to_color_map)
-            belongs_g = VGroup(belongs_a, belongs_b).arrange(DOWN).to_edge(DOWN)
-            self.play(belongs.animate.next_to(belongs_g, UP))
-            self.play(GrowEachCharText(belongs_a))
-            self.play(GrowEachCharText(belongs_b))
-        
-        with self.voiceover("Lo mismo aplica para pelota azul con 3"):
-            blue_ball = dots[2].copy()
-            blue_ball.replace(belongs_a[0])
-            blue_ball_copy = blue_ball.copy()
-            blue_ball_copy.replace(belongs[1])
-            three = MathTex("3")
-            three_copy = three.copy()
-            three.replace(belongs_b[0])
-            three_copy.replace(belongs[3])
-            def func(g):
-                g[0].submobjects[0] = blue_ball
-                g[1].submobjects[0] = three
-                g[2].submobjects[1], g[2].submobjects[3] = blue_ball_copy, three_copy
-                return g
-            self.play(ApplyFunction(func, VGroup(belongs_a, belongs_b, belongs)))
-        
-        with self.voiceover(
-            """Pero eso no se da en el orden inverso, porque tiene que estar
-            en el orden elemento de A coma elemento de B, no al revés"""
-        ):
-            def func(m):
-                m.become(MathTex("(", "3", ",", "X", ")", r"\in", "A", r"\times", "B") \
-                    .set_color_by_tex_to_color_map(tex_to_color_map).move_to(m))
-                three_copy.replace(m[1]), blue_ball_copy.replace(m[3])
-                m.submobjects[1], m.submobjects[3] = three_copy, blue_ball_copy
-                return m
-            self.play(ApplyFunction(func, belongs))
-            cross = Cross(belongs)
-            self.play(Create(cross))
-        
-        with self.voiceover(
-            """O sea el producto cartesiano entre A y B sería el resultado
-            de poner todas las combinaciones entre elementos de A primero y
-            elementos de B segundo, dicho en lenguaje matemático como se
-            muestra en pantalla"""
-        ):
-            self.play(FadeOut(set1, set2, belongs, belongs_a, belongs_b), Uncreate(cross))
-            self.play(a_cross_b_block.create())
+            a_b_vals = VGroup(
+                MathTex("a", "=", "-3"),
+                MathTex("b", "=", "-2")
+            ).arrange(DOWN).to_corner(DR)
+            for mob in a_b_vals:
+                mob: MathTex
+                mob.set_color_by_tex_to_color_map({"a": BLUE, "b": YELLOW, "-": GREY})
+            self.play(GrowEachCharText(a_b_vals))

@@ -17,17 +17,21 @@ class GrowEachCharText(LaggedStart):
 
 
 class ShrinkEachCharText(LaggedStart):
-    def __init__(self, mobject: Mobject, **kwargs):
-        animations = self.extract_animations(mobject)
+    def __init__(self, mobject: Mobject, fade_out=False, **kwargs):
+        animations = self.extract_animations(mobject, fade_out)
         super().__init__(*animations, **kwargs)
 
-    def extract_animations(self, mobject: Mobject):
+    def extract_animations(self, mobject: Mobject, fade_out):
         result = []
         if len(mobject.submobjects) > 0:
             for submobject in mobject.submobjects:
-                result += self.extract_animations(submobject)
+                result += self.extract_animations(submobject, fade_out)
         else:
-            result.append(ShrinkToCenter(mobject))
+            if fade_out is False:
+                anim = ShrinkToCenter(mobject)
+            else:
+                anim = FadeOut(mobject, scale=0.5)
+            result.append(anim)
         return result
 
 
@@ -49,3 +53,39 @@ class AddEachCharFlipping(LaggedStart):
         else:
             animations = [CreateFlipping(char) for part in mobject for char in part]
         super().__init__(*animations, **kwargs)
+
+
+class GrowAndShrinkABit(Animation):
+    def interpolate_mobject(self, alpha: float) -> None:
+        self.mobject.become(self.starting_mobject)
+        self.mobject.scale(-2.4 * alpha**2 + 3.4 * alpha)
+
+
+class GrowAndShrinkABitEachChar(LaggedStart):
+    def __init__(self, mobject, **kwargs):
+        animations = self.extract_animations(mobject)
+        super().__init__(*animations, **kwargs)
+
+    def extract_animations(self, mobject: Mobject):
+        result = []
+        if len(mobject.submobjects) > 0:
+            for submobject in mobject.submobjects:
+                result += self.extract_animations(submobject)
+        else:
+            result.append(GrowAndShrinkABit(mobject))
+        return result
+
+
+class FadeInFromLeft(LaggedStart):
+    def __init__(self, mobject: Mobject, **kwargs):
+        animations = self.extract_animations(mobject)
+        super().__init__(*animations, **kwargs)
+    
+    def extract_animations(self, mobject: Mobject):
+        result = []
+        if len(mobject.submobjects) > 0:
+            for submobject in mobject.submobjects:
+                result += self.extract_animations(submobject)
+        else:
+            result.append(FadeIn(mobject, shift=RIGHT))
+        return result

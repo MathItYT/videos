@@ -1,6 +1,5 @@
 from __future__ import annotations
 from manim.scene.scene import Scene
-import inspect
 import os
 import sys
 
